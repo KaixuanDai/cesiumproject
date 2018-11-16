@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>Hello 3D Earth</title>
+    <script src="/Build/CesiumUnminified/Cesium.js"></script>
+    <style>
+        @import url(Build/CesiumUnminified/Widgets/widgets.css);
+        html, body, #cesiumContainer {
+            width: 100%; height: 100%; margin: 0; padding: 0; overflow: auto;
+        }
+    </style>
+    
+</head>
+<body>
+
+        <div id="cesiumContainer"></div>
+   
+
+    <script>
+
+        var viewer = new Cesium.Viewer('cesiumContainer',{
+            animation:  false, //是否显示动画控件(左下方那个)
+            baseLayerPicker: true, //是否显示图层选择控件
+            geocoder: true, //是否显示地名查找控件
+            timeline: false, //是否显示时间线控件
+            sceneModePicker: true, //是否显示投影方式控件
+            navigationHelpButton: false, //是否显示帮助信息控件
+            infoBox: true, //是否显示点击要素之后显示的信息
+        });
+        viewer._cesiumWidget._creditContainer.style.display = "none";  //	去除版权信息
+       
+        
+        var promise = Cesium.GeoJsonDataSource.load('China.json');
+        promise.then(function(dataSource) {
+            viewer.dataSources.add(dataSource);
+        },
+
+        //Get the array of entities
+        // var entities = dataSource.entities.values;
+        // console.log(entities);
+
+        // // var entities = dataSource.entities.values;
+        // var polyPositions_2d=[];
+        // var num=0;
+        // for(var i=0;i<entities.length;i++)
+        // {
+        //     var entity=entities[i];
+        //     var polyPositions=entity.polygon.hierarchy.getValue().positions;
+        //     // console.log('x:'+entity.polygon.hierarchy.getValue().positions[1].x);
+        //     // console.log('y:'+entity.polygon.hierarchy.getValue().positions[1].y);
+        //     // console.log('z:'+entity.polygon.hierarchy.getValue().positions[1].z);
+
+            
+        //     for(var j=0;j<polyPositions.length;j++)
+        //     {
+        //         var p1=new Cesium.Cartesian2.fromCartesian3(polyPositions[j]);
+        //         polyPositions_2d.push(new Cesium.Cartesian2.fromCartesian3(p1));     
+                           
+        //     }
+        //     num+=polyPositions.length;
+        // }
+
+
+        //
+   
+   
+
+
+    src="app.js"
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

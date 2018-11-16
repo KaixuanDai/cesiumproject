@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello 3D Earth</title>
+    <script src="Build/CesiumUnminified/Cesium.js"></script>
+    <script type="text/javascript" src="Apps/Sandcastle/Sandcastle-header.js"></script>
+    <script type="text/javascript" src="ThirdParty/requirejs-2.1.20/require.js"></script>
+    <script type="text/javascript"> </script>
+    <script type="text/javascript">
+    
+       
+        </script>
+        
+   <style>
+        @import url(Build/CesiumUnminified/Widgets/widgets.css);
+        html, body, #cesiumContainer {
+            width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+        }
+        
+
+    </style>
+    <style>
+       
+            .btn-group .button {
+                background-color: #4CAF50; /* Green */
+                border: 1px solid green;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                width: 150px;
+                display: block;
+                margin:0 auto;
+                width:200px;
+            }
+            
+            .btn-group .button:not(:last-child) {
+                border-bottom: none; /* Prevent double borders */
+            }
+            
+            .btn-group .button:hover {
+                background-color: #3e8e41;
+            }
+            </style>
+    
+</head>
+<body>
+<table border="1" >
+    <tr>
+        <td>    
+             <div id="view2D"></div>
+        </td>
+        <td>
+           
+            <h1 align="center" >学习系统</h1>
+            <hr>
+           
+            <div>
+                
+                <video width="100%" height="300" controls>
+                        <source src="movie.mp4" type="video/mp4">
+                        <source src="movie.ogg" type="video/ogg">
+                </video>
+                <h2 align="center">学习视频</h2>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td >
+                <div id="view3D"></div>
+        </td>
+        <td >
+            
+            <h2  align="center">请选择学习尺度</h2>
+
+
+                
+                <div class="btn-group">
+                  <button class="button">大洲</button>
+                  <button class="button">国家</button>
+                  <button class="button">省份</button>
+                  <button class="button">区域</button>
+                  <button class="button">主页面</button>
+                  <button class="button">测试</button>
+                </div>
+             
+
+
+
+        </td>
+
+    </tr>
+</table>
+
+
+    <script>
+       // var viewer = new Cesium.Viewer('cesiumContainer');
+        //var viewer1 = new Cesium.Viewer('cesiumContainer1');
+       // viewer._cesiumWidget._creditContainer.style.display = "none";  //	去除版权信息
+       
+
+        var clockViewModel = new Cesium.ClockViewModel();
+        var options2D = {
+        fullscreenButton : false,
+        sceneModePicker : false,
+        clockViewModel : clockViewModel,
+        sceneMode : Cesium.SceneMode.SCENE2D,
+        animation:  false, //是否显示动画控件(左下方那个)
+        baseLayerPicker: true, //是否显示图层选择控件
+        geocoder: false, //是否显示地名查找控件
+        timeline: false, //是否显示时间线控件
+        sceneModePicker: false, //是否显示投影方式控件
+        navigationHelpButton: false, //是否显示帮助信息控件
+        infoBox: true, //是否显示点击要素之后显示的信息
+        
+
+    };
+        var options3D = {
+        homeButton : false,
+        fullscreenButton : false,
+        sceneModePicker : false,
+        clockViewModel : clockViewModel,
+        infoBox : false,
+        geocoder : false,
+        animation:  false, //是否显示动画控件(左下方那个)
+        baseLayerPicker: true, //是否显示图层选择控件
+        geocoder: false, //是否显示地名查找控件
+        timeline: false, //是否显示时间线控件
+        sceneModePicker: false, //是否显示投影方式控件
+        navigationHelpButton: false, //是否显示帮助信息控件
+        infoBox: true, //是否显示点击要素之后显示的信息
+        animation : false
+    };
+    // We create two viewers, a 2D and a 3D one
+    // The CSS is set up to place them side by side
+
+    var view2D = new Cesium.Viewer('view2D', options2D);
+    var view3D = new Cesium.Viewer('view3D', options3D);
+    view2D._cesiumWidget._creditContainer.style.display = "none";  //	去除版权信息
+    view3D._cesiumWidget._creditContainer.style.display = "none";  //	去除版权信息
+    
+
+    var worldPosition;
+    var distance;
+    var high;
+
+    /*Sandcastle.addDefaultToolbarButton('中国', function() {
+        high=view3D.scene.camera.positionWC.z;
+        view3D.camera.flyTo({
+        destination: Cesium.Rectangle.fromDegrees(74.18, 18.31, 128.05, 55.61)
+        });
+
+        view2D.camera.flyTo({
+        destination: Cesium.Rectangle.fromDegrees(74.18, 18.31, 128.05, 55.61)
+        });
+    
+    }); 
+
+    Sandcastle.addDefaultToolbarButton('农大', function() {
+        high=1500;
+        //high=view3D.scene.camera.positionWC.z;
+        view3D.camera.flyTo({
+        destination: Cesium.Rectangle.fromDegrees(116.35, 40.00, 116.36, 40.01)
+        });
+        view2D.camera.flyTo({
+        destination: Cesium.Rectangle.fromDegrees(116.35, 40.00, 116.36, 40.01)
+        });
+
+    });
+
+    Sandcastle.addDefaultToolbarButton('世界', function() {
+        high=view3D.scene.camera.positionWC.z;
+        view3D.camera.setView({
+        destination: Cesium.Rectangle.fromDegrees(-180.00, -90.00, 180.00, 90.00)
+        });
+        view2D.camera.setView({
+        destination: Cesium.Rectangle.fromDegrees(-180.00, -90.00, 180.00, 90.00)
+        });
+        
+    });
+    */
+
+    function sync3DView() {
+        // The center of the view is the point that the 3D camera is focusing on
+        var viewCenter = new Cesium.Cartesian2(Math.floor(view2D.canvas.clientWidth / 2), Math.floor(view2D.canvas.clientHeight / 2));
+        // Given the pixel in the center, get the world position
+        var newWorldPosition = view2D.scene.camera.pickEllipsoid(viewCenter);
+        if (Cesium.defined(newWorldPosition)){
+            // Guard against the case where the center of the screen
+            // does not fall on a position on the globe
+            worldPosition = newWorldPosition;
+        }
+        // Get the distance between the world position of the point the camera is focusing on, and the camera's world position
+        distance = Cesium.Cartesian3.distance(worldPosition, view3D.scene.camera.positionWC);
+        // Tell the 2D camera to look at the point of focus. The distance controls how zoomed in the 2D view is
+        // (try replacing `distance` in the line below with `1e7`. The view will still sync, but will have a constant zoom)t
+        view3D.scene.camera.lookAt(worldPosition, new Cesium.Cartesian3(0.0, 0.0, 100000000));
+    }
+
+    // Apply our sync function every time the 3D camera view changes
+    view2D.camera.changed.addEventListener(sync3DView);
+    // By default, the `camera.changed` event will trigger when the camera has changed by 50%
+    // To make it more sensitive, we can bring down this sensitivity
+    view2D.camera.percentageChanged = 0.01;
+
+    // Since the 2D view follows the 3D view, we disable any
+    // camera movement on the 2D view
+    view3D.scene.screenSpaceCameraController.enableRotate = false;
+    view3D.scene.screenSpaceCameraController.enableTranslate = false;
+    view3D.scene.screenSpaceCameraController.enableZoom = false;
+    view3D.scene.screenSpaceCameraController.enableTilt = false;
+    view3D.scene.screenSpaceCameraController.enableLook = false;
+    //Sandcastle_End
+        Sandcastle.finishedLoading();
+
+
+
+        </script>
+        
+        <script>
+            src="server.js"
+        </script>
+
+</body>
+</html>

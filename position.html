@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="description" content="Load GeoJSON or TopoJSON data and apply custom styling.">
+    <meta name="cesium-sandcastle-labels" content="Showcases, Tutorials, DataSources">
+    <title>Cesium Demo</title>
+    <script type="text/javascript" src="Apps/Sandcastle/Sandcastle-header.js"></script>
+    <script type="text/javascript" src="ThirdParty/requirejs-2.1.20/require.js"></script>
+    <script src="Build/CesiumUnminified/Cesium.js"></script>
+   
+
+
+    
+</head>
+<body class="sandcastle-loading" data-sandcastle-bucket="bucket-requirejs.html">
+<style>
+    @import url(Apps/Sandcastle/templates/bucket.css);
+    html, body {
+            width:100%; 
+            height: 100%; 
+            margin: 0; 
+            padding: 0; 
+            overflow:hidden;      
+            background: rgba(105, 255, 222, 0.856);     
+
+        }
+        #cesiumContainer {
+            width:100%; 
+            height: auto; 
+            display: flex;
+            flex-direction: column;
+          
+        }
+       
+    
+</style>
+<div id="main" style="position:absolute;width: 600px;height:400px;top:350px;left:900px;"></div>
+
+<div id="cesiumContainer" class="fullSize"></div>
+<div id="loadingOverlay"><h1>Loading...</h1></div>
+<div id="toolbar"></div>
+
+
+<script id="cesium_sandcastle_script">
+
+
+function startup(Cesium) {
+    'use strict';
+//Sandcastle_Begin
+var viewer = new Cesium.Viewer('cesiumContainer');
+
+var tf_a=2.0,tf_b=2.0;
+var tf_result=Cesium.Matrix4.IDENTITY;
+
+
+function createPoint(id,p){
+    viewer.entities.add({
+    name : id,
+    position : p,
+    point : {
+    pixelSize : 5,
+    color : Cesium.Color.RED,
+    outlineColor : Cesium.Color.WHITE,
+    outlineWidth : 2
+    }
+	});
+}
+//加载json数据
+var promise = Cesium.GeoJsonDataSource.load('China.json');
+promise.then(function(dataSource) {
+    viewer.dataSources.add(dataSource);
+
+    //Get the array of entities
+    var entities = dataSource.entities.values;
+    var p_3d=[];
+    //计算最小包围矩形
+    for (var i = 0; i < entities.length; i++) {
+        var entity = entities[i];
+        // Generate Polygon position
+        var polyPositions = entity.polygon.hierarchy.getValue(Cesium.JulianDate.now()).positions;//获取当前时间的一个位置消息
+	    for(var j=0;j<polyPositions.length;j++){
+		    p_3d.push(polyPositions[j]);
+		}
+	}
+    var rec=Cesium.Rectangle.fromCartesianArray(p_3d);
+		
+    //计算转换矩阵
+	var width=Cesium.Math.toDegrees(rec.width);
+	var height=Cesium.Math.toDegrees(rec.height);
+    var s_factor=(width/tf_a)<=(height/tf_b)?width/tf_a:height/tf_b;
+    tf_result = Cesium.Matrix4.fromTranslationQuaternionRotationScale(
+		new Cesium.Cartesian3(104.0,28.0,0.0),// translation //与加载的json对象一致。
+        Cesium.Quaternion.IDENTITY,           // rotation
+        new Cesium.Cartesian3(s_factor, s_factor, s_factor) // scale
+		);
+	
+}).otherwise(function(error){
+    //Display any errrors encountered while loading.
+    window.alert(error);
+});    
+	
+function updateStats(memuse) { 
+        viewer.entities.removeAll();
+	    var i;
+        for (i in memuse.tracks) {
+		    if(memuse.tracks[i].x>=-tf_a/2.0&&memuse.tracks[i].x<=tf_a/2.0&&memuse.tracks[i].y>=-tf_b/2.0&&memuse.tracks[i].y<=tf_b/2.0)
+		    {
+			    var x=memuse.tracks[i]["x"];
+		        var y=memuse.tracks[i]["y"];
+		        var track_p=new Cesium.Cartesian3(x,y,0.0);
+		        var c_point=Cesium.Matrix4.multiplyByPoint(tf_result, track_p, new Cesium.Cartesian3());
+                var f_point=Cesium.Cartesian3.fromDegrees(c_point.x,c_point.y);
+                
+		        createPoint(memuse.tracks[i]["id"].toString(), f_point);
+			}
+        }
+    }
+    
+    var ws = new WebSocket('ws://' + '192.168.1.4' + ':3030');
+    ws.onopen = function()
+            {
+                alert("open WebSocket on server");
+            };
+
+    ws.onmessage = function (evt)
+            {
+               updateStats(JSON.parse(evt.data));
+            };
+
+    ws.onclose = function()
+            {
+                // websocket is closed.
+                alert("Connection is closed...");
+            };
+
+
+//Sandcastle_End
+    Sandcastle.finishedLoading();
+}
+if (typeof Cesium !== "undefined") {
+    startup(Cesium);
+} else if (typeof require === "function") {
+    require(["Cesium"], startup);
+}
+
+</script>
+
+</body>
+</html>

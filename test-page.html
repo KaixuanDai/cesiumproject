@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <meta name="description" content="Use the mouse to select and manipulate objects in the scene.">
+  <meta name="cesium-sandcastle-labels" content="Showcases">
+
+  <script src="/js/jquery-3.3.1.min.js" type="text/javascript"></script>
+
+  <!--Cesium脚本-->
+  <script type="text/javascript" src="Build/CesiumUnminified/Cesium.js"></script>
+  <script type="text/javascript" src="Apps/Sandcastle/Sandcastle-header.js"></script>
+  <script type="text/javascript" src="ThirdParty/requirejs-2.1.20/require.js"></script>
+  <!--CSS3免写前缀兼容各大浏览器-->
+  <script type="text/javascript" src="/js/prefixfree.min.js"></script>
+  <script type="text/javascript" src="/js/rightMenu.js"></script>
+  <script type="text/javascript" src="/js/doubleViewer.js"></script>
+  <script type="text/javascript" src="/js/video.js"></script>
+
+  <script type="text/javascript" src="/js/load.js"></script>
+  <script type="text/javascript" src="/js/connect.js"></script>
+  <script type="text/javascript" src="/js/judge1.js"></script>
+  <script type="text/javascript" src="/js/pictures.js"></script>
+
+  <script type="text/javascript" src="/js/slider.js"></script>
+
+
+
+  <link rel="stylesheet" type="text/css" href="/css/selection.css">
+  <link rel="stylesheet" type="text/css" href="/css/menu.css">
+
+  <!-- <link rel="stylesheet" type="text/css" href="/font-awesome/css/font-awesome.min.css"> -->
+  <link rel="stylesheet" type="text/css" href="/css/pic_normalize.css" />
+  <link rel="stylesheet" type="text/css" href="/css/pictures.css">
+
+
+
+  <title>测试模块</title>
+
+  <style>
+    @import url(Build/CesiumUnminified/Widgets/widgets.css);
+        html, body {
+            width: 98%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow:hidden;
+            background: white;
+        }
+        #cesiumContainer {
+            width: 98%;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+
+        }
+        #view3D {
+          position: absolute;
+            bottom: -100px;
+            width: 70%;
+            height: 47%;
+            line-height:0px;
+            margin: 0px;
+          }
+          #view2D {
+              position: absolute;
+              height: 80%;
+              width: 100%;
+              line-height:0px;
+              margin: 0px;
+          }
+          #trailer {
+              position: absolute;
+              bottom: 100px;
+              right: 30px;
+              width: 320px;
+              height: 180px;
+              }
+          a{TEXT-DECORATION:none;
+                COLOR:black;
+              }
+
+
+</style>
+
+
+
+
+</head>
+
+<body class="sandcastle-loading" data-sandcastle-bucket="bucket-requirejs.html">
+
+  <div id="cesiumContainer">
+    <!-- cesium 窗体 -->
+    <div id="view2D"></div>
+
+    <div id="view3D"></div>
+    <!--左侧尺度选择菜单-->
+    <ul class="drawer">
+
+      <li>
+        <a href="#">
+          <i class="fa fa-info-circle"></i>
+          <span>尺度选择</span>
+        </a>
+        <ul>
+          <li>
+            <a onclick="loadContinents();fresh1()" target="_blank">
+              <i class="fa fa-folder-open"></i>
+              <span>大洲</span>
+            </a>
+          </li>
+          <li>
+            <a onclick="loadCountries();fresh2()" target="_blank">
+              <i class="fa fa-question-circle"></i>
+              <span>国家</span>
+            </a>
+          </li>
+          <li>
+            <a onclick="loadChina();fresh3()" target="_blank">
+              <i class="fa fa-phone-square"></i>
+              <span>省份</span>
+            </a>
+          </li>
+          <li>
+            <a id="sector" onclick="loadSector();fresh4()" target="_blank">
+              <i class="fa fa-phone-square"></i>
+              <span>区域</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <!--html视频播放组件，不显示-->
+    <video id="trailer" style="display: none;" autoplay="autoplay" loop="" crossorigin="" controls="">
+      <source id="firstVideo" src="" type="video/mp4">
+
+      Your browser does not support the <code>video</code> element.
+    </video>
+    <!--右侧主菜单-->
+    <nav class="top-right">
+      <a href="index-page.html" class="disc l2" onclick="js_method()">
+        <div>返回主页</div>
+      </a>
+      <a href="help-page.html" class="disc l3" onclick="js_method()">
+        <div>帮助文档</div>
+      </a>
+      <a href="learn-page.html" class="disc l4" onclick="js_method()">
+        <div>进入学习</div>
+      </a>
+      <a class="disc l5 toggle">
+        MENU
+      </a>
+    </nav>
+
+    <div class="container">
+      <div class="slider" id="slider">
+        <button type="button" class="button button-prev">
+          <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="button button-next">
+          <i class="fa fa-chevron-right" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+
+
+  <script language=javascript>
+    rightMenu();
+    var view2D = create2D();
+    var view3D = create3D();
+    doubleViewer(view2D, view3D);
+    var src = "server.js"
+
+    var ws = new WebSocket('ws://' + '192.168.1.5' + ':3030');
+    ws.onopen = function () {
+      console.log("open WebSocket on server");
+
+    };
+
+    ws.onmessage = function (evt) {
+      if (tf_a == 0) {
+        getWidth(JSON.parse(evt.data));
+      }
+      updateStats(JSON.parse(evt.data));
+    };
+
+    ws.onclose = function () {
+      // websocket is closed.
+      console.log("Connection is closed...");
+    };
+
+
+    function js_method() {
+      ws.close();
+    }
+  </script>
+
+</body>
+
+</html>

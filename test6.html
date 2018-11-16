@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        
+      // 开启一个web worker线程(加载js文件,创建worker对象)
+		var worker =new Worker("my_worker.js"); 
+		
+		// 传递数据给work
+		worker.postMessage(5000);     
+		
+		console.log("continue ...");
+		
+		// 接收work返回的数据
+		worker.onmessage =function(evt){    
+			console.log("main now is: " + new Date());            
+			console.log(evt.data);              
+		}
+		
+		console.log("no wait ...");
+
+        
+        </script>
+</body>
+</html>

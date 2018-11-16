@@ -1,0 +1,57 @@
+@bg:       #F7F4E4;
+@water:    #9BC4EB;
+@land:     #8B9C52;
+@vehicles: #F0FBFC;
+@hilight:  rgba(255,255,255,0.2);
+@shadow:   rgba(0,0,0,0.05);
+@speed:    10s; //time to complete a rotaion. Vehciles also based on this.
+
+body{background-color: @bg;}
+
+figure{
+  width: 50%;
+  margin: 8vh auto 0 auto;
+  max-width: 80vh;
+  
+  #sea   { fill: @water;   }
+  #hi    { fill: @hilight; }
+  #light { fill: white;    }
+  #shad  { fill: @shadow;  }
+  #land  { fill: @land;
+    animation: spin @speed linear infinite forwards;
+  }
+  .vehicles use{
+    fill: @vehicles;
+    animation: orbit @speed * 1.5 linear infinite;
+    transform-origin: center center;
+  }
+  
+  #boat1 {
+    transform: translateX(40px) translateY(-80px);
+    use{animation-duration: @speed * 3;}
+  }
+  #plane1{
+    transform: translateX(-10px) translateY(170px);
+  }
+  #plane2{
+    transform: translateX(170px) translateY(150px);
+    use{ animation-delay: @speed * .75; }
+  }
+  #plane3{
+    transform: translateX(140px) translateY(-50px);
+    use{ animation-delay: @speed / 8; animation-duration: @speed * 1.2; }
+  }
+  #bike1 {
+    transform: translateX(50px) translateY(190px);
+    use{ animation-duration: @speed * 2.5; }
+  }
+  
+  @keyframes orbit{
+      from {transform: rotate(0deg) translateX(-160px) ;}
+      to   {transform: rotate(360deg) translateX(-160px) ;}
+  }
+  @keyframes spin{
+    from { transform: translateX(-300px);}
+    to   { transform: translateX(0px);}
+  }
+}

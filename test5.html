@@ -1,0 +1,62 @@
+<!DOCTYPE html>  
+<html lang="zh-cn">  
+    <head>  
+        <meta charset="UTF-8"/>  
+        <title>与线程进行数据交互</title>  
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>  
+        <script type="text/javascript">  
+$(function() {  
+    var intArray = new Array(100);  
+    for(var index = 0; index < intArray.length; index++) {  
+        intArray[index] = parseInt(Math.random() * 100);  
+    }  
+
+    var worker = new Worker("sumWorker.js");  
+
+    worker.postMessage(JSON.stringify(intArray));  
+
+    worker.addEventListener("message", function(event) {  
+        if(event.data != "") {  
+            var array = JSON.parse(event.data);  
+            var row, col;  
+            for(var index = 0; index < array.length; index++) {  
+                row = parseInt(index / 10);  
+                col = index % 10;  
+                if(col == 0) {  
+                    $("<tr>").appendTo("tbody");  
+                }  
+                $("<td>").text(array[row * 10 + col]).appendTo("tbody tr:last");  
+            }  
+        }  
+    }, false);  
+});  
+
+
+self.addEventListener("message", function(event) {  
+    
+    var data = JSON.parse(event.data);  
+    
+    var returnArray = new Array();  
+    
+    var temp;  
+    
+    for(var index = 0; index < data.length; index++) {  
+        if((temp = data[index]) % 3 == 0) {  
+            returnArray.push(temp);  
+        }  
+    }  
+    
+    self.postMessage(JSON.stringify(returnArray));
+
+}, false);  
+
+
+        </script>  
+    </head>  
+    <body>  
+        <table>  
+            <caption>从随机生成的数字中抽取3的倍数并显示</caption>  
+            <tbody></tbody>  
+        </table>  
+    </body>  
+</html>  

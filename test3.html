@@ -1,0 +1,262 @@
+   
+   <!DOCTYPE html>
+   <html>
+   <head>
+       <meta charset="utf-8">
+       <title>ECharts</title>
+       <!-- 引入 echarts.js -->
+      
+       <script src="node_modules/echarts/dist/echarts.js"></script>
+       <script src="node_modules/echarts/dist/echarts.min.js"></script>
+       <script src="chart.js"></script>
+       <script src="macarons.js"></script>
+
+       
+       <link rel="stylesheet" href="style3.css" media="screen" type="text/css" />
+
+       <link rel="stylesheet" type="text/css" href="css/normalize.css" /><!--CSS RESET-->
+       <link rel="stylesheet" href="css/jquery.plusgallery.css">
+
+
+   </head>
+   <body>
+        <div class='card-holder'>
+                <div class='card-wrapper'>
+                  <a href='#'>
+                    <div class='card bg-01'>
+                      <span class='card-content'>item #1</span>
+                    </div>
+                  </a>
+                </div>
+                <div class='card-wrapper'>
+                  <a href='#'>
+                    <div class='card bg-02'>
+                      <span class='card-content'>请选择尺度</span>
+                    </div>
+                  </a>
+                </div>
+                <div class='card-wrapper'>
+                  <a href='#'>
+                    <div class='card bg-03'>
+                      <span class='card-content'>menu item #3</span>
+                    </div>
+                  </a>
+                </div>
+                <div class='card-wrapper'>
+                  <a href='#'>
+                    <div class='card bg-04'>
+                      <span class='card-content'>item #4</span>
+                    </div>
+                  </a>
+                </div>
+                <div class='card-wrapper'>
+                  <a href='#'>
+                    <div class='card bg-05'>
+                      <span class='card-content'>menu item #5</span>
+                    </div>
+                  </a>
+                </div>
+                <div class='card-wrapper'>
+                  <a href='#'>
+                    <div class='card bg-06'>
+                      <span class='card-content'>long menu item #1</span>
+                    </div>
+                  </a>
+                </div>
+              </div>
+              <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';">
+           
+             
+            </div>
+              <div id="main" style="width: 600px;height:400px;top:350px;left:900px;"></div>
+
+              <div class="content" style="max-width: 600px; width: 100%;margin: 20px auto;">
+                    <h1>plusGallery example</h1>
+                    <div class="myplusgallery" style="position: relative;">
+                      <div class="img-prev" title="Previous Image">&#8249;</div>
+                      <div class="img-next" title="Next Image">&#8250;</div>
+                      <div class="img-overlay">
+                        <p>仿Google+简洁jQuery轮播图 <br>
+                      </div>
+                          
+                          <div class="img-slide">
+                        <figure>
+                          <img src="img/end_of_days_by_tacosauceninja-dar6in5.jpg" alt="End of Days" />
+                        </figure>
+                        <figure>
+                          <img src="img/technical_department__by_crist_jroger-dar782h.jpg" alt="Technical Department" />
+                        </figure>
+                        <figure>
+                          <img src="img/the_music_nature_by_ethernity.jpg" alt="The music nature" />
+                        </figure>
+                        <figure>
+                          <img src="img/inktober_glow_lowres_2_by_ingridtan-dar56m5.jpg" alt="Glow" />
+                        </figure>
+                        <figure>
+                          <img src="img/scorched_earth_by_arcipello-d5118nz.jpg" alt="Scorched Earth" />
+                        </figure>
+                      </div>
+                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <script>
+    
+    var myChart = echarts.init(document.getElementById('main'),'macarons');
+      createChart(myChart);
+                
+     // myChart.dispatchAction({type: 'showTip', seriesIndex: '0', dataIndex: '2',name:'position'});
+      
+
+      timer = setInterval(function () {
+            //var curr = count % total;
+            var count=0
+            //3.0以上版本的showTip使用方式
+            myChart.dispatchAction({type: 'showTip', seriesIndex: '0', dataIndex: count});
+            count += 1;
+        }, 1);
+
+
+
+
+
+
+
+
+      </script>
+      <!-- <script type="text/javascript">
+          // 基于准备好的dom，初始化echarts实例
+          var myChart = echarts.init(document.getElementById('main'));
+  
+          
+option = {
+    
+    tooltip: {
+        trigger: "axis",
+        showDelay: 0,
+        axisPointer: {
+            type: "cross",
+            lineStyle: {
+                type: "dashed",
+                width: 1
+            }
+        }
+    },
+    legend: {
+        data: ["position"]
+    },
+    toolbox: {
+        show: true,
+        feature: {
+            mark: {
+                show: true
+            },
+            dataZoom: {
+                show: true
+            },
+            dataView: {
+                show: true,
+                readOnly: true
+            },
+            restore: {
+                show: true
+            },
+            saveAsImage: {
+                show: true
+            }
+        }
+    },
+    xAxis: [
+        {
+            type: "value",
+            power: 1,
+            splitNumber: 4,
+            scale: true
+        }
+    ],
+    yAxis: [
+        {
+            type: "value",
+            power: 1,
+            splitNumber: 4,
+            scale: true
+        }
+    ],
+    series: [
+        {
+            name: "position",
+            type: "scatter",
+            symbol: "circle",
+            data: [[-69, 58, 70], [10, 74, 29]],
+            markPoint: {
+                data: []
+            },
+            symbolSize: 10
+           
+        }
+    ],
+    title: {
+        text: "实时位置"
+    }
+
+};
+
+var myChart;
+var data=[0];
+var shift=false;
+var p_x=10;
+var p_y=10;
+
+function addData(shift) {
+        data.push([p_x,p_y]);
+ if (shift) {
+        data.shift();
+     }
+
+}
+
+
+var timeTicket = setInterval(function (){
+
+addData(true);  
+
+myChart.setOption({
+       
+        series: [{
+            name:'position',
+            data: data,
+            symbolSize: 10
+        }]
+        
+    
+})
+}, 1000);
+
+
+ 
+
+          
+
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    </script> -->
+    
+   
+
+</body>
+
+
+</html>

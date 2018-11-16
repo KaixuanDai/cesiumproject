@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<script src="/js/jquery-3.3.1.min.js"></script>
+<script src="Build/CesiumUnminified/Cesium.js"></script>
+ <script type="text/javascript" src="Apps/Sandcastle/Sandcastle-header.js"></script>
+ <script type="text/javascript" src="ThirdParty/requirejs-2.1.20/require.js"></script>
+ <script type="text/javascript"> </script>
+ <script src="load.js"></script>
+<title>cesium-test</title>
+<style>
+        @import url(Build/CesiumUnminified/Widgets/widgets.css);
+        html, body, #cesiumContainer {
+            width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+        }
+    </style>
+<style
+type="text/css">
+#Container{
+    width:1200px;
+    margin:0 auto;/*设置整个容器在浏览器中水平居中*/
+    background:#CF3;
+}
+#Header{
+    height:80px;
+    background:#093;
+}
+#logo{
+    padding-left:50px;
+    padding-top:20px;
+    padding-bottom:50px;
+}
+#Content{
+    overflow:auto;
+    /*此处对容器设置了高度，一般不建议对容器设置高度，一般使用overflow:auto;属性设置容器根据内容自适应高度，如果不指定高度或不设置自适应高度，容器将默认为1个字符高度，容器下方的布局元素（footer）设置margin-top:属性将无效*/
+    margin-top:0px;/*此处讲解margin的用法，设置content与上面header元素之间的距离*/
+    background:#0FF;
+     
+}
+#Content-Left{
+    height:710px;
+    width:430px;
+    margin:20px;/*设置元素跟其他元素的距离为20像素*/
+    float:right;/*设置浮动，实现多列效果，div+Css布局中很重要的*/
+    background:#90C;
+}
+#Content-Main{
+    height:400px;
+    width:1000px;
+    margin:10px;/*设置元素跟其他元素的距离为20像素*/
+    float:left;/*设置浮动，实现多列效果，div+Css布局中很重要的*/
+    background:#90C;
+}
+/*注：Content-Left和Content-Main元素是Content元素的子元素，两个元素使用了float:left;设置成两列，这个两个元素的宽度和这个两个元素设置的padding、margin的和一定不能大于父层Content元素的宽度，否则设置列将失败*/
+#Footer{
+    height:40px;
+    background:#90C;
+    margin-top:20px;
+}
+.Clear{
+    clear:both;
+}
+.slogan{
+    height: 40px;
+    width: 200px;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.h1 {
+    font-size: 180%;
+    margin-left: auto;
+    margin-right: auto;
+    }
+
+
+    .btn-group .button {
+    background-color: green; /* Green */
+    border: 1px solid white;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    width: 150px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.btn-group .button:not(:last-child) {
+    border-bottom: none; /* Prevent double borders */
+}
+
+.btn-group .button:hover {
+    background-color: #3e8e41;
+}
+
+.button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+.right{
+    margin-right: 10px;
+}
+.left{
+    margin-left: 155px;
+
+}
+</style>
+</head> 
+ 
+<body>
+<!-- <div id="Container">   
+    <div id="Header">
+    <div id="logo">这里设置了padding属性介绍一下padding的用法,padding将设置文本与边框的距离。</div> 
+</div> -->
+<div id="Content">
+    <div id="Content-Left">
+        <div id="slogan">
+            <h1 align="center">测试模块</h1>
+        </div>
+        <div align="center" >
+                    <video id="video" width="390" height="240" controls="controls" autoplay="autoplay" >
+                        
+                        <source id="firstVedio" src="" type="video/mp4" />
+                        
+                        </object>
+                    </video>
+        </div>
+        <hr>
+    <div>
+        <h1 align="center">请选择尺度</h1>
+        
+    </div>
+        <div class="btn-group">
+            <button class="button" onclick=loadContinents()>大洲</button>
+            <button class="button" onclick=loadCountries()>国家</button>
+            <button class="button" onclick="loadChina()">省份</button>
+            <button class="button"  onclick="loadSector()">区域</button>
+        </div>
+        <div>
+                <a href="index-page.html">
+
+                        <button class="button right">返回主页</button>
+                </a>
+                <a href="learn-page.html">
+                        <button class="button left">返回学习</button>
+                </a>
+               
+        </div>
+    </div>
+   
+
+    <div id="Content-Main">
+        <div id="view2D"></div>
+    </div>
+    <div id="Content-Main">               
+         <div id="view3D"></div>
+</div>
+
+</div>
+
+<div class="Clear"></div>
+<div id="Footer">Footer</div>
+</div>
+<script>
+        // var viewer = new Cesium.Viewer('cesiumContainer');
+         //var viewer1 = new Cesium.Viewer('cesiumContainer1');
+        // viewer._cesiumWidget._creditContainer.style.display = "none";  //	去除版权信息
+        
+ 
+         var clockViewModel = new Cesium.ClockViewModel();
+         var options2D = {
+         fullscreenButton : false,
+         sceneModePicker : false,
+         clockViewModel : clockViewModel,
+         sceneMode : Cesium.SceneMode.SCENE2D,
+         animation:  false, //是否显示动画控件(左下方那个)
+         baseLayerPicker: true, //是否显示图层选择控件
+         geocoder: false, //是否显示地名查找控件
+         timeline: false, //是否显示时间线控件
+         sceneModePicker: false, //是否显示投影方式控件
+         navigationHelpButton: false, //是否显示帮助信息控件
+         infoBox: false, //是否显示点击要素之后显示的信息
+         
+ 
+     };
+         var options3D = {
+         homeButton : false,
+         fullscreenButton : false,
+         sceneModePicker : false,
+         clockViewModel : clockViewModel,
+         infoBox : false,
+         geocoder : false,
+         animation:  false, //是否显示动画控件(左下方那个)
+         baseLayerPicker: true, //是否显示图层选择控件
+         geocoder: false, //是否显示地名查找控件
+         timeline: false, //是否显示时间线控件
+         sceneModePicker: false, //是否显示投影方式控件
+         navigationHelpButton: false, //是否显示帮助信息控件
+         infoBox: true, //是否显示点击要素之后显示的信息
+         animation : false
+     };
+
+     var picken = {
+         enti: undefined,
+         originalColor: Cesium.Color.YELLOW.withAlpha(0.5)
+     }
+     // We create two viewers, a 2D and a 3D one
+     // The CSS is set up to place them side by side
+ 
+     var view2D = new Cesium.Viewer('view2D', options2D);
+     var view3D = new Cesium.Viewer('view3D', options3D);
+     view2D._cesiumWidget._creditContainer.style.display = "none";  //	去除版权信息
+     view3D._cesiumWidget._creditContainer.style.display = "none";  //	去除版权信息
+     
+ 
+     var worldPosition;
+     var distance;
+     var high;
+ 
+     /*Sandcastle.addDefaultToolbarButton('中国', function() {
+         high=view3D.scene.camera.positionWC.z;
+         view3D.camera.flyTo({
+         destination: Cesium.Rectangle.fromDegrees(74.18, 18.31, 128.05, 55.61)
+         });
+ 
+         view2D.camera.flyTo({
+         destination: Cesium.Rectangle.fromDegrees(74.18, 18.31, 128.05, 55.61)
+         });
+     
+     }); 
+ 
+     Sandcastle.addDefaultToolbarButton('农大', function() {
+         high=1500;
+         //high=view3D.scene.camera.positionWC.z;
+         view3D.camera.flyTo({
+         destination: Cesium.Rectangle.fromDegrees(116.35, 40.00, 116.36, 40.01)
+         });
+         view2D.camera.flyTo({
+         destination: Cesium.Rectangle.fromDegrees(116.35, 40.00, 116.36, 40.01)
+         });
+ 
+     });
+ 
+     Sandcastle.addDefaultToolbarButton('世界', function() {
+         high=view3D.scene.camera.positionWC.z;
+         view3D.camera.setView({
+         destination: Cesium.Rectangle.fromDegrees(-180.00, -90.00, 180.00, 90.00)
+         });
+         view2D.camera.setView({
+         destination: Cesium.Rectangle.fromDegrees(-180.00, -90.00, 180.00, 90.00)
+         });
+         
+     });
+     */
+ 
+     function sync3DView() {
+         // The center of the view is the point that the 3D camera is focusing on
+         var viewCenter = new Cesium.Cartesian2(Math.floor(view2D.canvas.clientWidth / 2), Math.floor(view2D.canvas.clientHeight / 2));
+         // Given the pixel in the center, get the world position
+         var newWorldPosition = view2D.scene.camera.pickEllipsoid(viewCenter);
+         if (Cesium.defined(newWorldPosition)){
+             // Guard against the case where the center of the screen
+             // does not fall on a position on the globe
+             worldPosition = newWorldPosition;
+         }
+         // Get the distance between the world position of the point the camera is focusing on, and the camera's world position
+         distance = Cesium.Cartesian3.distance(worldPosition, view3D.scene.camera.positionWC);
+         // Tell the 2D camera to look at the point of focus. The distance controls how zoomed in the 2D view is
+         // (try replacing `distance` in the line below with `1e7`. The view will still sync, but will have a constant zoom)t
+         view3D.scene.camera.lookAt(worldPosition, new Cesium.Cartesian3(0.0, 0.0, 100000000));
+     }
+ 
+     // Apply our sync function every time the 3D camera view changes
+     view2D.camera.changed.addEventListener(sync3DView);
+     // By default, the `camera.changed` event will trigger when the camera has changed by 50%
+     // To make it more sensitive, we can bring down this sensitivity
+     view2D.camera.percentageChanged = 0.01;
+ 
+     // Since the 2D view follows the 3D view, we disable any
+     // camera movement on the 2D view
+     view3D.scene.screenSpaceCameraController.enableRotate = false;
+     view3D.scene.screenSpaceCameraController.enableTranslate = false;
+     view3D.scene.screenSpaceCameraController.enableZoom = false;
+     view3D.scene.screenSpaceCameraController.enableTilt = false;
+     view3D.scene.screenSpaceCameraController.enableLook = false;
+     //Sandcastle_End
+         Sandcastle.finishedLoading();
+         
+         
+         
+         
+         var pickName;
+
+          function panduan(lon, lat)
+        {
+            var scene = view2D.scene;
+            var handler;
+            handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+            
+            handler.setInputAction(function(movement){
+                var point = Cesium.Cartesian3.fromDegrees(lon, lat);
+                var point_1 = scene.cartesianToCanvasCoordinates(point);
+              
+                // alert(point);
+                //将上一个被选择的实体还原
+                if(Cesium.defined(picken.enti))
+                {
+                    picken.enti.polygon.material = picken.originalColor;
+                    picken.enti = undefined;
+                }
+
+                var pickedObject = scene.pick(movement.endPosition);
+                
+                view2D.selectedEntity=pickedObject;
+                if(Cesium.defined(pickedObject))
+                {
+                    var id = pickedObject.id;
+                    //选择新的实体
+                    if(!Cesium.defined(id))
+                    {
+                        return;
+                    }
+                   
+                    if(id instanceof Cesium.Entity)
+                    {
+                        //alert('ieoei');
+                        picken.enti = id;
+                        id.polygon.material = Cesium.Color.RED.withAlpha(0.5);
+                        pickName=pickedObject.id.name;
+
+                        
+                        //view2D.zoomTo(id);
+                    }
+                }
+            }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+        } 
+        var lon = 116;
+        var lat = 40;
+        panduan(lon, lat);
+        
+        
+   
+
+
+
+
+
+
+//视频切换处理
+       view2D.selectedEntityChanged.addEventListener(function(){
+       var vid = document.getElementById("video");
+        
+        console.log(pickName);
+        $.ajax({
+            url: "videoSrc.json",//json文件位置
+            type: "GET",//请求方式为get
+            dataType: "json", //返回数据格式为json
+            success: function(data) {//请求成功完成后要执行的方法 
+                //each循环 使用$.each方法遍历返回的数据date
+                $.each(data, function(i, item) {
+                    if(item.name==pickName)  
+                        {
+                            document.getElementById("firstVedio").src= item.src;  
+                            document.getElementById("video").load();
+                        }  
+                })
+            }
+        })
+      })
+
+        var iframe = document.getElementsByClassName('cesium-infoBox-iframe')[0];
+        iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms'); 
+        var pinBuilder = new Cesium.PinBuilder();
+        
+        var bluePin = view3D.entities.add({
+            description: '<iframe width="400" height="300" src="https://www.youtube.com/embed/ACJJi5re5NU" frameborder="0" allowfullscreen></iframe>',
+            position : Cesium.Cartesian3.fromDegrees(-75.170726, 39.9208667),
+            billboard : {
+                image : pinBuilder.fromColor(Cesium.Color.ROYALBLUE, 48).toDataURL(),
+                verticalOrigin : Cesium.VerticalOrigin.BOTTOM
+            }
+        });
+        view3D.zoomTo(bluePin);
+
+
+
+
+
+
+         </script>
+         
+         <script>
+             src="server.js"
+         </script>
+ 
+</body>
+</html>
